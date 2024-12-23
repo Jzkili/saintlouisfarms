@@ -1,0 +1,47 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main  # Trigger workflow on push to the main branch
+  pull_request:
+    branches:
+      - main  # Trigger workflow on pull requests to the main branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Use the latest Ubuntu runner
+
+    steps:
+      # Step 1: Checkout the code from the repository
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Java with the required version (e.g., JDK 11)
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'  # Specify the version you are using
+          distribution: 'adoptopenjdk'
+
+      # Step 3: Install Gradle
+      - name: Install Gradle
+        uses: gradle/wrapper-validation-action@v1
+
+      # Step 4: Build the project using Gradle
+      - name: Build Project with Gradle
+        run: ./gradlew build  # This will compile the project
+
+      # Step 5: Run automated tests (e.g., contextLoads)
+      - name: Run Tests
+        run: ./gradlew test  # This will run all tests, including contextLoads()
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build  # Only deploy after the build and tests pass
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+
